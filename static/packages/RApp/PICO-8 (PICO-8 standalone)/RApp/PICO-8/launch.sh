@@ -91,23 +91,30 @@ purge_devil() {
 }
 
 start_pico() {
+    # 检查是否存在 PICO-8 的动态链接库文件，如果不存在则显示信息面板并退出
     if [ ! -e "$picodir/bin/pico8_dyn" ]; then
         infoPanel --title "PICO-8 binaries not found" --message "Native PICO-8 engine requires to purchase official \nbinaries which are not provided in Onion. \nGo to Lexaloffle's website, get Raspberry Pi version\n and copy \"pico8_dyn\" and \"pico8.dat\"\n to your SD card in \"/RApp/PICO-8/bin\"."
         cd /mnt/SDCARD/.tmp_update/script
         ./remove_last_recent_entry.sh
         exit
     fi
+
+    # 调用 purge_devil 函数，用于终止相关进程
     purge_devil
 
+    # 设置 LD_LIBRARY_PATH 和各种 SDL 变量
     export LD_LIBRARY_PATH="$picodir/lib:$LD_LIBRARY_PATH"
     export SDL_VIDEODRIVER=mmiyoo
     export SDL_AUDIODRIVER=mmiyoo
     export EGL_VIDEODRIVER=mmiyoo
 
+    # 修复配置文件中的显示设置
     fixconfig
 
+    # 调用 stop_audioserver.sh 脚本停止音频服务器
     . /mnt/SDCARD/.tmp_update/script/stop_audioserver.sh
 
+    # 如果启动的是 Splore，则在启动前后检查 BBS_DIR 目录下的文件数量
     if [ "$filename" = "~Run PICO-8 with Splore.png" ]; then
         num_files_before=$(ls -1 "$BBS_DIR" | wc -l)
         LD_PRELOAD="$picodir/lib/libcpt_hook.so" pico8_dyn -splore -preblit_scale 3
@@ -115,8 +122,8 @@ start_pico() {
         if [ "$num_files_before" -ne "$num_files_after" ]; then
             rm -f /mnt/SDCARD/Roms/PICO/PICO_cache6.db
         fi
-
     else
+        # 启动 PICO-8 运行指定的游戏
         LD_PRELOAD="$picodir/lib/libcpt_hook.so" pico8_dyn -preblit_scale 3 -run "$rompath"
     fi
 }
