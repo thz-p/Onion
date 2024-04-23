@@ -171,20 +171,31 @@ void drawLine(int x1, int y1, int x2, int y2, Uint32 color)
 int _renderText(const char *text, TTF_Font *font, SDL_Color color, SDL_Rect *rect, bool right_align)
 {
     int text_width = 0;
+
+    // 使用 TTF_RenderUTF8_Blended 函数创建文字表面
     SDL_Surface *textSurface = TTF_RenderUTF8_Blended(font, text, color);
+    
+    // 检查表面是否成功创建
     if (textSurface != NULL) {
+        // 获取文字宽度
         text_width = textSurface->w;
+
+        // 根据是否右对齐来决定渲染文字的位置
         if (right_align)
             SDL_BlitSurface(textSurface, NULL, screen, &(SDL_Rect){rect->x - textSurface->w, rect->y, rect->w, rect->h});
         else
             SDL_BlitSurface(textSurface, NULL, screen, rect);
+        
+        // 释放文字表面
         SDL_FreeSurface(textSurface);
     }
+
     return text_width;
 }
 
 int renderText(const char *text, TTF_Font *font, SDL_Color color, SDL_Rect *rect)
 {
+    // 调用 _renderText 函数，使用左对齐方式渲染文字
     return _renderText(text, font, color, rect, false);
 }
 
