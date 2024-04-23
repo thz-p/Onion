@@ -1,31 +1,39 @@
 #!/bin/sh
 echo $0 $*
-picodir=$(dirname "$0")
+picodir=$(dirname "$0")  # 获取当前脚本的所在目录，并赋值给变量 picodir
+export picodir="$picodir"  # 将 picodir 导出，使其在其他脚本或程序中可用
+export picoconfig="/mnt/SDCARD/Saves/CurrentProfile/saves/PICO-8"  # 设置 PICO-8 配置目录的路径，并导出
+export rompath="$1"  # 将传递给脚本的 PICO-8 游戏 ROM 的路径赋值给变量 rompath，并导出
+export filename=$(basename "$rompath")  # 从 rompath 中提取 PICO-8 游戏的文件名，并导出
 
-export picodir="$picodir"
-export picoconfig="/mnt/SDCARD/Saves/CurrentProfile/saves/PICO-8"
-export rompath="$1"
-export filename=$(basename "$rompath")
+cd $picodir  # 切换当前工作目录到脚本所在目录
 
-cd $picodir
+# 添加脚本目录下的 bin 子目录到 PATH 环境变量中
 export PATH=$PATH:$PWD/bin
-export HOME=$picoconfig
-export BBS_DIR="/mnt/SDCARD/Roms/PICO/splore/" # change me to a location for the bbs carts to go to
 
+# 设置 PICO-8 配置目录为 HOME 目录
+export HOME=$picoconfig
+
+# 设置 BBS（BBS 车带系统）目录的路径，即存放 BBS 车带的位置
+export BBS_DIR="/mnt/SDCARD/Roms/PICO/splore/"
+
+# 如果 BBS 目录不存在，则创建
 if [ ! -d "$BBS_DIR" ]; then
     mkdir -p "$BBS_DIR"
 fi
 
-# some users have reported black screens at boot. we'll check if the file exists, then check the keys to see if they match the known good config
+# 一些用户报告启动时出现黑屏。我们将检查文件是否存在，然后检查键是否与已知的良好配置匹配
 fixconfig() {
-    config_file="${picoconfig}/.lexaloffle/pico-8/config.txt"
+    config_file="${picoconfig}/.lexaloffle/pico-8/config.txt"  # 设置配置文件的路径
 
+    # 如果配置文件不存在，则输出提示信息
     if [ ! -f "$config_file" ]; then
         echo "Config file not found, creating with default values."
     fi
 
-    echo "Config checker: Validating display settings in config.txt"
+    echo "Config checker: Validating display settings in config.txt"  # 输出检查显示设置的提示信息
 
+    # 设置各个显示相关的默认值
     set_window_size="window_size 640 480"
     set_screen_size="screen_size 640 480"
     set_windowed="windowed 0"
@@ -36,9 +44,10 @@ fixconfig() {
     set_transform_screen="transform_screen 134"
     set_host_framerate_control="host_framerate_control 0"
 
+    # 遍历各个显示设置，并根据需要更新或添加到配置文件中
     for setting in window_size screen_size windowed window_position frameless fullscreen_method blit_method transform_screen host_framerate_control; do
         case $setting in
-        window_size) new_value="$set_window_size" ;;
+        window_size) new_value="$set_window_size" ;;  # 根据设置的情况选择相应的新值
         screen_size) new_value="$set_screen_size" ;;
         windowed) new_value="$set_windowed" ;;
         window_position) new_value="$set_window_position" ;;
@@ -49,16 +58,17 @@ fixconfig() {
         host_framerate_control) new_value="$set_host_framerate_control" ;;
         esac
 
+        # 检查配置文件中是否包含当前设置，并根据需要更新或添加到配置文件中
         if grep -q "^$setting" "$config_file"; then
-            sed -i "s/^$setting.*/$new_value/" "$config_file"
+            sed -i "s/^$setting.*/$new_value/" "$config_file"  # 替换配置文件中已有的设置
             echo "Updated setting: $setting"
         else
-            echo "$new_value" >>"$config_file"
+            echo "$new_value" >>"$config_file"  # 将新的设置添加到配置文件中
             echo "Added missing setting: $setting"
         fi
     done
 
-    echo "Updated settings:"
+    echo "Updated settings:"  # 输出更新后的设置
     grep -E "window_size|screen_size|windowed|window_position|frameless|fullscreen_method|blit_method|transform_screen|host_framerate_control" "$config_file"
 }
 
