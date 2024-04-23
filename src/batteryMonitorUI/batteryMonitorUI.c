@@ -125,39 +125,37 @@ void secondsToHoursMinutes(int seconds, char *output)
     sprintf(output, "%dh%02d", hours, minutes);
 }
 
+// 这个函数用于绘制两点之间的直线。
+// 它使用了 Bresenham 算法来绘制直线，该算法通过逐步逼近直线路径来高效绘制直线。
 void drawLine(int x1, int y1, int x2, int y2, Uint32 color)
 {
-    int dx, dy, sx, sy, err, e2;
+    // 计算直线在 x 方向和 y 方向上的变化量
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
 
-    dx = abs(x2 - x1);
-    dy = abs(y2 - y1);
+    // 设置在 x 和 y 方向上的步进方向
+    int sx = (x1 < x2) ? 1 : -1;
+    int sy = (y1 < y2) ? 1 : -1;
 
-    if (x1 < x2) {
-        sx = 1;
-    }
-    else {
-        sx = -1;
-    }
+    // 计算误差值
+    int err = dx - dy;
+    int e2;
 
-    if (y1 < y2) {
-        sy = 1;
-    }
-    else {
-        sy = -1;
-    }
-
-    err = dx - dy;
-
+    // 循环绘制直线上的像素
     while (1) {
+        // 绘制当前像素点
         SDL_Rect pixel = {x1, y1, 1, 1};
         SDL_FillRect(screen, &pixel, color);
 
+        // 如果到达终点，则退出循环
         if (x1 == x2 && y1 == y2) {
             break;
         }
 
+        // 计算误差的两倍
         e2 = 2 * err;
 
+        // 根据误差的情况更新坐标
         if (e2 > -dy) {
             err -= dy;
             x1 += sx;
