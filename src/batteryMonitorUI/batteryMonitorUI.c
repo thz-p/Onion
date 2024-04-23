@@ -494,36 +494,54 @@ void renderPage()
 
 int main(int argc, char *argv[])
 {
+    // 初始化
     init();
+
+    // 初始化按键状态数组
     KeyState keystate[320] = {(KeyState)0};
+
+    // 渲染等待界面
     render_waiting_screen();
 
+    // 获取设备型号和序列号
     getDeviceModel();
     getDeviceSerial();
+
+    // 计算图表数据
     compute_graph();
+
+    // 渲染页面
     renderPage();
 
+    // 循环直到退出
     bool changed;
-
     while (!quit) {
-
+        // 标记页面是否发生变化
         changed = false;
+
+        // 更新按键状态
         if (updateKeystate(keystate, &quit, true, NULL)) {
+            // 如果 B 按钮被按下，则退出程序
             if (keystate[SW_BTN_B] == PRESSED)
                 quit = true;
+
+            // 如果右方向按钮被按下，且当前页面不是第一页，则当前页面减一，标记页面发生变化
             if (keystate[SW_BTN_RIGHT] >= PRESSED) {
                 if (current_page > 0)
                     current_page--;
                 changed = true;
             }
+
+            // 如果左方向按钮被按下，且当前页面不是最后一页，则当前页面加一，标记页面发生变化
             if (keystate[SW_BTN_LEFT] >= PRESSED) {
                 int page_max = (int)(((GRAPH_MAX_FULL_PAGES) * (GRAPH_PAGE_SCROLL_SMOOTHNESS)) / (segment_duration / 1800));
                 page_max -= GRAPH_PAGE_SCROLL_SMOOTHNESS;
-
                 if (page_max > current_page)
                     current_page++;
                 changed = true;
             }
+
+            // 如果 R1 或 R2 按钮被按下，且当前缩放级别小于 2，则当前页面置零，缩放级别加一，标记页面发生变化
             if ((keystate[SW_BTN_R1] >= PRESSED) || (keystate[SW_BTN_R2] >= PRESSED)) {
                 if (current_zoom < 2) {
                     current_page = 0;
@@ -531,6 +549,8 @@ int main(int argc, char *argv[])
                     changed = true;
                 }
             }
+
+            // 如果 L1 或 L2 按钮被按下，且当前缩放级别大于 0，则当前页面置零，缩放级别减一，标记页面发生变化
             if ((keystate[SW_BTN_L1] >= PRESSED) || (keystate[SW_BTN_L2] >= PRESSED)) {
                 if (current_zoom > 0) {
                     current_page = 0;
@@ -540,11 +560,17 @@ int main(int argc, char *argv[])
             }
         }
 
+        // 如果页面没有发生变化，则继续下一次循环
         if (!changed)
             continue;
 
+        // 重新渲染页面
         renderPage();
     }
+
+    // 释放资源
     free_resources();
+
+    // 退出程序
     return EXIT_SUCCESS;
 }
