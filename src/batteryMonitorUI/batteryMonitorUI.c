@@ -117,8 +117,11 @@ void free_resources(void)
 
 void secondsToHoursMinutes(int seconds, char *output)
 {
+    // 计算小时数
     int hours = seconds / 3600;
+    // 计算剩余的分钟数
     int minutes = (seconds % 3600) / 60;
+    // 格式化输出字符串
     sprintf(output, "%dh%02d", hours, minutes);
 }
 
