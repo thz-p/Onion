@@ -249,22 +249,27 @@ void render_waiting_screen()
 
 int battery_to_pixel(int battery_perc)
 {
-    // Converts a battery percentage to a pixel coordinate
+    // 将电池百分比转换为像素坐标
+
+    // 计算垂直像素坐标
     int y = (int)((GRAPH_DISPLAY_SIZE_Y * battery_perc) / 100) + GRAPH_DISPLAY_START_Y;
 
+    // 检查像素坐标是否超出界限
     if ((y < 0) || (y > 480)) {
-        return -1;
+        return -1; // 超出界限则返回 -1
     }
     else {
-        return y;
+        return y; // 在界限内则返回像素坐标
     }
 }
 
 int duration_to_pixel(int duration)
 {
-    // Convert a duration to a number of pixel
-    // (At a scale of zoom = 1:1, one segment = 30mn)
-    // 270 mn total, 16200 seconds
+    // 将持续时间转换为像素数
+    // （在缩放比例为 1:1 的情况下，一个段 = 30分钟）
+    // 总计 270 分钟，16200 秒
+
+    // 计算水平像素数
     return (int)((GRAPH_DISPLAY_SIZE_X * duration) / GRAPH_DISPLAY_DURATION);
 }
 
