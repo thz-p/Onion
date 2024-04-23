@@ -73,6 +73,7 @@ fixconfig() {
 }
 
 purge_devil() {
+    # 检查是否有名为 "/dev/l" 的进程正在运行，如果有则终止它
     if pgrep -f "/dev/l" >/dev/null; then
         echo "Process /dev/l is running. Killing it now..."
         killall -2 l
@@ -80,7 +81,7 @@ purge_devil() {
         echo "Process /dev/l is not running."
     fi
 
-    # this handles a second startup of pico-8, if /dev/l has already been replaced by disp_init
+    # 处理 pico-8 的第二次启动，如果 /dev/l 已经被 disp_init 替换
     if pgrep -f "disp_init" >/dev/null; then
         echo "Process disp_init is running. Killing it now..."
         killall -9 disp_init
