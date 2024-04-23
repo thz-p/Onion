@@ -91,17 +91,27 @@ void init(void)
 
 void free_resources(void)
 {
+    // 关闭字体文件
     TTF_CloseFont(font_Arkhip);
+    // 退出 TTF 库
     TTF_Quit();
 
+    // 释放等待屏幕图片
     SDL_FreeSurface(waiting_screen);
+    // 释放背景图片
     SDL_FreeSurface(background);
+    // 释放右箭头图片
     SDL_FreeSurface(right_arrow);
+    // 释放左箭头图片
     SDL_FreeSurface(left_arrow);
+    // 释放结束图表图片
     SDL_FreeSurface(end_graph);
 
+    // 释放屏幕表面
     SDL_FreeSurface(screen);
+    // 释放视频显示窗口
     SDL_FreeSurface(video);
+    // 退出 SDL 库
     SDL_Quit();
 }
 
