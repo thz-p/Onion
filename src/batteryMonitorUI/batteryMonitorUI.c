@@ -54,23 +54,38 @@ static TTF_Font *font_Arkhip;
 
 void init(void)
 {
+    // 设置日志名称为 "batteryMonitorUI"
     log_setName("batteryMonitorUI");
+    
+    // 注册信号处理函数
     signal(SIGINT, sigHandler);
     signal(SIGTERM, sigHandler);
 
+    // 初始化 SDL
     SDL_Init(SDL_INIT_VIDEO);
+    // 隐藏鼠标指针
     SDL_ShowCursor(SDL_DISABLE);
+    // 设置键盘重复间隔时间
     SDL_EnableKeyRepeat(300, 50);
+    // 初始化 SDL TTF 库
     TTF_Init();
 
+    // 创建视频显示窗口
     video = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
+    // 创建屏幕表面
     screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 640, 480, 32, 0, 0, 0, 0);
+    // 加载等待屏幕图片
     waiting_screen = IMG_Load("./res/waiting_screen.png");
+    // 加载背景图片
     background = IMG_Load("./res/background.png");
+    // 加载右箭头图片
     right_arrow = IMG_Load("./res/right_arrow.png");
+    // 加载左箭头图片
     left_arrow = IMG_Load("./res/left_arrow.png");
+    // 加载结束图表图片
     end_graph = IMG_Load("./res/end.png");
 
+    // 加载字体文件
     font_Arkhip = TTF_OpenFont("./res/Arkhip_font.ttf", 15);
 }
 
